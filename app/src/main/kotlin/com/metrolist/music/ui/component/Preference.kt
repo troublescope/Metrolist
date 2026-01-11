@@ -50,6 +50,10 @@ import androidx.compose.ui.window.DialogProperties
 import com.metrolist.music.R
 import kotlin.math.roundToInt
 
+import com.metrolist.ui.tv.focusableItem
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 @Composable
 fun PreferenceEntry(
     modifier: Modifier = Modifier,
@@ -66,10 +70,17 @@ fun PreferenceEntry(
         modifier =
         modifier
             .fillMaxWidth()
-            .clickable(
-                enabled = isEnabled && onClick != null,
-                onClick = onClick ?: {},
-            ).alpha(if (isEnabled) 1f else 0.5f)
+            .then(
+                if (isEnabled && onClick != null) {
+                    Modifier.focusableItem(
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = onClick
+                    )
+                } else {
+                    Modifier
+                }
+            )
+            .alpha(if (isEnabled) 1f else 0.5f)
             .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
         if (icon != null) {
@@ -213,7 +224,11 @@ fun SwitchPreference(
                         contentDescription = null,
                         modifier = Modifier.size(SwitchDefaults.IconSize),
                     )
-                }
+                },
+                modifier = Modifier.focusableItem(
+                    shape = CircleShape,
+                    onClick = { onCheckedChange(!checked) }
+                )
             )
         },
         onClick = { onCheckedChange(!checked) },

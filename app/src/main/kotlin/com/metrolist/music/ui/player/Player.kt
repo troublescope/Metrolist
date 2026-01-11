@@ -1108,7 +1108,12 @@ fun BottomSheetPlayer(
                             sliderPosition = null
                         },
                         colors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
-                        modifier = Modifier.padding(horizontal = PlayerHorizontalPadding),
+                        modifier = Modifier
+                            .padding(horizontal = PlayerHorizontalPadding)
+                            .focusableItem(
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp),
+                                onClick = {}
+                            ),
                     )
                 }
 
@@ -1285,6 +1290,10 @@ fun BottomSheetPlayer(
                                 modifier = Modifier
                                     .height(68.dp)
                                     .weight(backButtonWeight)
+                                    .focusableItem(
+                                        shape = RoundedCornerShape(50),
+                                        onClick = playerConnection::seekToPrevious
+                                    )
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_previous),
@@ -1294,6 +1303,11 @@ fun BottomSheetPlayer(
                             }
 
                             Spacer(modifier = Modifier.width(8.dp))
+
+                            val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+                            LaunchedEffect(Unit) {
+                                focusRequester.requestFocus()
+                            }
 
                             FilledIconButton(
                                 onClick = {
@@ -1319,6 +1333,24 @@ fun BottomSheetPlayer(
                                 modifier = Modifier
                                     .height(68.dp)
                                     .weight(playPauseWeight)
+                                    .focusRequester(focusRequester)
+                                    .focusableItem(
+                                        shape = RoundedCornerShape(50),
+                                        onClick = {
+                                            if (isCasting) {
+                                                if (castIsPlaying) {
+                                                    castHandler?.pause()
+                                                } else {
+                                                    castHandler?.play()
+                                                }
+                                            } else if (playbackState == STATE_ENDED) {
+                                                playerConnection.player.seekTo(0, 0)
+                                                playerConnection.player.playWhenReady = true
+                                            } else {
+                                                playerConnection.togglePlayPause()
+                                            }
+                                        }
+                                    )
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -1353,6 +1385,10 @@ fun BottomSheetPlayer(
                                 modifier = Modifier
                                     .height(68.dp)
                                     .weight(nextButtonWeight)
+                                    .focusableItem(
+                                        shape = RoundedCornerShape(50),
+                                        onClick = playerConnection::seekToNext
+                                    )
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_next),
@@ -1369,7 +1405,14 @@ fun BottomSheetPlayer(
                                 .fillMaxWidth()
                                 .padding(horizontal = PlayerHorizontalPadding),
                         ) {
-                            Box(modifier = Modifier.weight(1f)) {
+                            Box(modifier = Modifier
+                                .weight(1f)
+                                .focusableItem(
+                                    shape = androidx.compose.foundation.shape.CircleShape,
+                                    onClick = {
+                                        playerConnection.player.toggleRepeatMode()
+                                    }
+                                )) {
                                 ResizableIconButton(
                                     icon = when (repeatMode) {
                                         Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
@@ -1388,7 +1431,12 @@ fun BottomSheetPlayer(
                                 )
                             }
 
-                            Box(modifier = Modifier.weight(1f)) {
+                            Box(modifier = Modifier
+                                .weight(1f)
+                                .focusableItem(
+                                    shape = androidx.compose.foundation.shape.CircleShape,
+                                    onClick = playerConnection::seekToPrevious
+                                )) {
                                 ResizableIconButton(
                                     icon = R.drawable.skip_previous,
                                     enabled = canSkipPrevious,
@@ -1403,26 +1451,34 @@ fun BottomSheetPlayer(
 
                             Spacer(Modifier.width(8.dp))
 
+                            val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+                            LaunchedEffect(Unit) {
+                                focusRequester.requestFocus()
+                            }
                             Box(
                                 modifier =
                                 Modifier
                                     .size(72.dp)
                                     .clip(RoundedCornerShape(playPauseRoundness))
                                     .background(textButtonColor)
-                                    .clickable {
-                                        if (isCasting) {
-                                            if (castIsPlaying) {
-                                                castHandler?.pause()
+                                    .focusRequester(focusRequester)
+                                    .focusableItem(
+                                        shape = RoundedCornerShape(playPauseRoundness),
+                                        onClick = {
+                                            if (isCasting) {
+                                                if (castIsPlaying) {
+                                                    castHandler?.pause()
+                                                } else {
+                                                    castHandler?.play()
+                                                }
+                                            } else if (playbackState == STATE_ENDED) {
+                                                playerConnection.player.seekTo(0, 0)
+                                                playerConnection.player.playWhenReady = true
                                             } else {
-                                                castHandler?.play()
+                                                playerConnection.player.togglePlayPause()
                                             }
-                                        } else if (playbackState == STATE_ENDED) {
-                                            playerConnection.player.seekTo(0, 0)
-                                            playerConnection.player.playWhenReady = true
-                                        } else {
-                                            playerConnection.player.togglePlayPause()
                                         }
-                                    },
+                                    ),
                             ) {
                                 Image(
                                     painter =
@@ -1448,7 +1504,12 @@ fun BottomSheetPlayer(
 
                             Spacer(Modifier.width(8.dp))
 
-                            Box(modifier = Modifier.weight(1f)) {
+                            Box(modifier = Modifier
+                                .weight(1f)
+                                .focusableItem(
+                                    shape = androidx.compose.foundation.shape.CircleShape,
+                                    onClick = playerConnection::seekToNext
+                                )) {
                                 ResizableIconButton(
                                     icon = R.drawable.skip_next,
                                     enabled = canSkipNext,
@@ -1461,7 +1522,12 @@ fun BottomSheetPlayer(
                                 )
                             }
 
-                            Box(modifier = Modifier.weight(1f)) {
+                            Box(modifier = Modifier
+                                .weight(1f)
+                                .focusableItem(
+                                    shape = androidx.compose.foundation.shape.CircleShape,
+                                    onClick = playerConnection::toggleLike
+                                )) {
                                 ResizableIconButton(
                                     icon = if (currentSong?.song?.liked == true) R.drawable.favorite else R.drawable.favorite_border,
                                     color = if (currentSong?.song?.liked == true) MaterialTheme.colorScheme.error else TextBackgroundColor,

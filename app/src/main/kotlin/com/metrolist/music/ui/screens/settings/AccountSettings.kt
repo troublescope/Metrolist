@@ -132,21 +132,29 @@ fun AccountSettings(
 
         Spacer(Modifier.height(12.dp))
 
-        val accountSectionModifier = Modifier.clickable {
-            onClose()
-            if (isLoggedIn) {
-                navController.navigate("account")
-            } else {
-                navController.navigate("login")
-            }
+        val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
         }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = accountSectionModifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surface)
+                .focusRequester(focusRequester)
+                .focusableItem(
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {
+                        onClose()
+                        if (isLoggedIn) {
+                            navController.navigate("account")
+                        } else {
+                            navController.navigate("login")
+                        }
+                    }
+                )
                 .padding(horizontal = 18.dp, vertical = 12.dp)
         ) {
             if (isLoggedIn && accountImageUrl != null) {
@@ -183,6 +191,12 @@ fun AccountSettings(
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    modifier = Modifier.focusableItem(
+                        shape = CircleShape,
+                        onClick = {
+                            accountSettingsViewModel.logoutAndClearSyncedContent(context, onInnerTubeCookieChange)
+                        }
                     )
                 ) {
                     Text(stringResource(R.string.action_logout))
