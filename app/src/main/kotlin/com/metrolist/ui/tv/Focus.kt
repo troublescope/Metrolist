@@ -99,6 +99,7 @@ fun FocusableIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = CircleShape,
+    onLongClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -106,7 +107,8 @@ fun FocusableIconButton(
             .size(48.dp)
             .focusableItem(
                 shape = shape,
-                onClick = onClick
+                onClick = onClick,
+                onLongClick = onLongClick
             )
             .alpha(if (enabled) 1f else 0.5f),
         contentAlignment = Alignment.Center
