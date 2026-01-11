@@ -39,6 +39,8 @@ kuromojiIpadic = "0.9.0"
 extractor = "d7c67daf"
 tinypinyin = "2.0.3"
 squigglyslider = "1.0.0"
+tvFoundation = "1.0.0-alpha12"
+tvMaterial = "1.1.0-alpha01"
 
 [libraries]
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -122,6 +124,8 @@ extractor = { module = "com.github.mostafaalagamy:MetrolistExtractor", version.r
 kuromoji-ipadic = { module = "com.atilika.kuromoji:kuromoji-ipadic", version.ref = "kuromojiIpadic" }
 tinypinyin = { module = "com.github.promeG:tinypinyin", version.ref = "tinypinyin" }
 squigglyslider = { module = "me.saket.squigglyslider:squigglyslider", version.ref = "squigglyslider" }
+androidx-tv-foundation = { module = "androidx.tv:tv-foundation", version.ref = "tvFoundation" }
+androidx-tv-material = { module = "androidx.tv:tv-material", version.ref = "tvMaterial" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

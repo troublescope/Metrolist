@@ -261,4 +261,6 @@ dependencies {
 
     // Icons
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.tv.foundation)
+    implementation(libs.androidx.tv.material)
 }

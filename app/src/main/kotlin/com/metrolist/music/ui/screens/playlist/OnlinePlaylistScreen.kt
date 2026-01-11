@@ -67,6 +67,7 @@ import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.utils.makeTimeString
 import com.metrolist.music.constants.HideExplicitKey
 import com.metrolist.music.viewmodels.OnlinePlaylistViewModel
+import com.metrolist.ui.tv.focusableItem
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -188,26 +189,27 @@ fun OnlinePlaylistScreen(
                             isPlaying = isPlaying,
                             isSelected = inSelectMode && songItem.id in selection,
                             modifier = Modifier
-                                .combinedClickable(
-                                    enabled = !hideExplicit || !songItem.explicit,
+                                .focusableItem(
+                                    shape = RoundedCornerShape(8.dp),
                                     onClick = {
-                                        if (inSelectMode) {
-                                            onCheckedChange(songItem.id !in selection)
-                                        } else if (songItem.id == mediaMetadata?.id) {
-                                            playerConnection.togglePlayPause()
-                                        } else {
-                                            playerConnection.playQueue(
-                                                ListQueue(
-                                                    title = playlist.title,
-                                                    items = filteredSongs.map { it.second.toMediaItem() },
-                                                    startIndex = index
+                                        if (!hideExplicit || !songItem.explicit) {
+                                            if (inSelectMode) {
+                                                onCheckedChange(songItem.id !in selection)
+                                            } else if (songItem.id == mediaMetadata?.id) {
+                                                playerConnection.togglePlayPause()
+                                            } else {
+                                                playerConnection.playQueue(
+                                                    ListQueue(
+                                                        title = playlist.title,
+                                                        items = filteredSongs.map { it.second.toMediaItem() },
+                                                        startIndex = index
+                                                    )
                                                 )
-                                            )
+                                            }
                                         }
                                     },
                                     onLongClick = {
                                         if (!inSelectMode) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                             inSelectMode = true
                                             onCheckedChange(true)
                                         }
@@ -373,6 +375,11 @@ private fun OnlinePlaylistHeader(
     val playerConnection = LocalPlayerConnection.current ?: return
     val database = LocalDatabase.current
     val menuState = LocalMenuState.current
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     Column(
         modifier = modifier
@@ -437,25 +444,29 @@ private fun OnlinePlaylistHeader(
         ) {
             // Like Button - Smaller secondary button
             Surface(
-                onClick = {
-                    database.query {
-                        if (dbPlaylist != null) {
-                            update(dbPlaylist.playlist.toggleLike())
-                        } else {
-                            insert(
-                                PlaylistEntity(
-                                    id = playlist.id,
-                                    name = playlist.title,
-                                    browseId = playlist.id,
-                                    bookmarkedAt = LocalDateTime.now()
-                                )
-                            )
-                        }
-                    }
-                },
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier
+                    .size(48.dp)
+                    .focusableItem(
+                        shape = CircleShape,
+                        onClick = {
+                            database.query {
+                                if (dbPlaylist != null) {
+                                    update(dbPlaylist.playlist.toggleLike())
+                                } else {
+                                    insert(
+                                        PlaylistEntity(
+                                            id = playlist.id,
+                                            name = playlist.title,
+                                            browseId = playlist.id,
+                                            bookmarkedAt = LocalDateTime.now()
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    )
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -477,14 +488,19 @@ private fun OnlinePlaylistHeader(
 
             // Play Button - Larger primary circular button
             Surface(
-                onClick = {
-                    if (songs.isNotEmpty()) {
-                        playerConnection.playQueue(ListQueue(playlist.title, songs.map { it.toMediaItem() }))
-                    }
-                },
                 color = MaterialTheme.colorScheme.primary,
                 shape = CircleShape,
-                modifier = Modifier.size(72.dp)
+                modifier = Modifier
+                    .size(72.dp)
+                    .focusRequester(focusRequester)
+                    .focusableItem(
+                        shape = CircleShape,
+                        onClick = {
+                            if (songs.isNotEmpty()) {
+                                playerConnection.playQueue(ListQueue(playlist.title, songs.map { it.toMediaItem() }))
+                            }
+                        }
+                    )
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -501,19 +517,23 @@ private fun OnlinePlaylistHeader(
 
             // Menu Button - Smaller secondary button
             Surface(
-                onClick = {
-                    menuState.show {
-                        YouTubePlaylistMenu(
-                            playlist = playlist,
-                            songs = songs,
-                            coroutineScope = coroutineScope,
-                            onDismiss = menuState::dismiss
-                        )
-                    }
-                },
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier
+                    .size(48.dp)
+                    .focusableItem(
+                        shape = CircleShape,
+                        onClick = {
+                            menuState.show {
+                                YouTubePlaylistMenu(
+                                    playlist = playlist,
+                                    songs = songs,
+                                    coroutineScope = coroutineScope,
+                                    onDismiss = menuState::dismiss
+                                )
+                            }
+                        }
+                    )
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

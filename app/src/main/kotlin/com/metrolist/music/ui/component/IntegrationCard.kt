@@ -81,26 +81,39 @@ fun IntegrationCard(
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
-                    IntegrationCardItemRow(item = item)
+                    IntegrationCardItemRow(
+                        item = item,
+                        shape = shape
+                    )
                 }
             }
         }
     }
 }
 
+import androidx.compose.ui.graphics.Shape
+import com.metrolist.ui.tv.focusableItem
+
 /**
  * Individual settings item row with Material 3 styling
  */
 @Composable
 private fun IntegrationCardItemRow(
-    item: IntegrationCardItem
+    item: IntegrationCardItem,
+    shape: Shape
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(
-                enabled = item.onClick != null,
-                onClick = { item.onClick?.invoke() }
+            .then(
+                if (item.onClick != null) {
+                    Modifier.focusableItem(
+                        shape = shape,
+                        onClick = { item.onClick?.invoke() }
+                    )
+                } else {
+                    Modifier
+                }
             )
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
