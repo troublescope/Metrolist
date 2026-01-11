@@ -68,6 +68,7 @@ import com.metrolist.music.utils.makeTimeString
 import com.metrolist.music.constants.HideExplicitKey
 import com.metrolist.music.viewmodels.OnlinePlaylistViewModel
 import com.metrolist.ui.tv.focusableItem
+import com.metrolist.ui.tv.FocusableIconButton
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -287,7 +288,7 @@ fun OnlinePlaylistScreen(
                 }
             },
             navigationIcon = {
-                IconButton(
+                FocusableIconButton(
                     onClick = {
                         if (isSearching) {
                             isSearching = false
@@ -325,7 +326,7 @@ fun OnlinePlaylistScreen(
                             }
                         }
                     )
-                    IconButton(
+                    FocusableIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
                             menuState.show {
@@ -344,7 +345,7 @@ fun OnlinePlaylistScreen(
                         )
                     }
                 } else if (!isSearching) {
-                    IconButton(
+                    FocusableIconButton(
                         onClick = { isSearching = true }
                     ) {
                         Icon(

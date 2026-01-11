@@ -7,7 +7,6 @@ package com.metrolist.music.ui.component
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Shape
+import com.metrolist.ui.tv.focusableItem
 
 /**
  * A Material 3 Expressive style settings group component
@@ -90,9 +91,6 @@ fun IntegrationCard(
         }
     }
 }
-
-import androidx.compose.ui.graphics.Shape
-import com.metrolist.ui.tv.focusableItem
 
 /**
  * Individual settings item row with Material 3 styling
@@ -157,53 +155,53 @@ private fun IntegrationCardItemRow(
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
-                        modifier = Modifier.size(24.dp)
-                    )
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+
+            // Title and description
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                // Title content
+                ProvideTextStyle(MaterialTheme.typography.titleMedium) {
+                    item.title()
+                }
+
+                // Description if provided
+                item.description?.let { desc ->
+                    Spacer(modifier = Modifier.height(2.dp))
+                    ProvideTextStyle(
+                        MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    ) {
+                        desc()
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
-        }
-
-        // Title and description
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            // Title content
-            ProvideTextStyle(MaterialTheme.typography.titleMedium) {
-                item.title()
+            // Trailing content
+            item.trailingContent?.let { trailing ->
+                Spacer(modifier = Modifier.width(8.dp))
+                trailing()
             }
-
-            // Description if provided
-            item.description?.let { desc ->
-                Spacer(modifier = Modifier.height(2.dp))
-                ProvideTextStyle(
-                    MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                ) {
-                    desc()
-                }
-            }
-        }
-
-        // Trailing content
-        item.trailingContent?.let { trailing ->
-            Spacer(modifier = Modifier.width(8.dp))
-            trailing()
         }
     }
-}
 
-/**
- * Data class for Material 3 settings item
- */
-data class IntegrationCardItem(
-    val icon: Painter? = null,
-    val title: @Composable () -> Unit,
-    val description: (@Composable () -> Unit)? = null,
-    val trailingContent: (@Composable () -> Unit)? = null,
-    val showBadge: Boolean = false,
-    val isHighlighted: Boolean = false,
-    val onClick: (() -> Unit)? = null
-)
+    /**
+     * Data class for Material 3 settings item
+     */
+    data class IntegrationCardItem(
+        val icon: Painter? = null,
+        val title: @Composable () -> Unit,
+        val description: (@Composable () -> Unit)? = null,
+        val trailingContent: (@Composable () -> Unit)? = null,
+        val showBadge: Boolean = false,
+        val isHighlighted: Boolean = false,
+        val onClick: (() -> Unit)? = null
+    )
